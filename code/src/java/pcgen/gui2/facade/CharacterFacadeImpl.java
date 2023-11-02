@@ -35,7 +35,7 @@ import java.util.Map.Entry;
 import java.util.Objects;
 import java.util.Optional;
 import java.util.Set;
-
+import org.apache.commons.lang3.StringUtils;
 import pcgen.cdom.base.AssociatedPrereqObject;
 import pcgen.cdom.base.CDOMObject;
 import pcgen.cdom.base.CDOMReference;
@@ -149,6 +149,7 @@ import pcgen.facade.util.WriteableReferenceFacade;
 import pcgen.facade.util.event.ChangeListener;
 import pcgen.facade.util.event.ListEvent;
 import pcgen.facade.util.event.ListListener;
+import pcgen.facade.util.event.ReferenceListener;
 import pcgen.gui2.UIPropertyContext;
 import pcgen.gui2.util.CoreInterfaceUtilities;
 import pcgen.io.ExportException;
@@ -168,8 +169,6 @@ import pcgen.util.Logging;
 import pcgen.util.enumeration.Load;
 import pcgen.util.enumeration.Tab;
 import pcgen.util.enumeration.View;
-
-import org.apache.commons.lang3.StringUtils;
 
 /**
  * The Class {@code CharacterFacadeImpl} is an implementation of
@@ -262,6 +261,7 @@ public class CharacterFacadeImpl
 	private TemplateListener templateListener;
 	private XPListener xpListener;
 	private AutoEquipListener autoEquipListener;
+	private DefaultReferenceFacade<Integer> statsBonusesChanged = new DefaultReferenceFacade<>(0);
 
 	/**
 	 * Create a new character facade for an existing character.
@@ -458,6 +458,18 @@ public class CharacterFacadeImpl
 	private WriteableReferenceFacade<Number> getStatReferenceFacade(PCStat stat)
 	{
 		return ChannelCompatibility.getStatScore(theCharacter.getCharID(), stat);
+	}
+
+	@Override
+	public void addStatsBonusesChangedListener(ReferenceListener<Integer> listener)
+	{
+		statsBonusesChanged.addReferenceListener(listener);
+	}
+
+	@Override
+	public void removeStatsBonusesChangedListener(ReferenceListener<Integer> listener)
+	{
+		statsBonusesChanged.removeReferenceListener(listener);
 	}
 
 	/**
@@ -1598,6 +1610,8 @@ public class CharacterFacadeImpl
 			charLevelsFacade.fireSkillBonusEvent(this, 0, true);
 			charLevelsFacade.updateSkillsTodo();
 		}
+
+		statsBonusesChanged.set(statsBonusesChanged.get() + 1);
 	}
 
 	@Override

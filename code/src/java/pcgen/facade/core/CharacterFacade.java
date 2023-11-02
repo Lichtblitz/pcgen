@@ -23,7 +23,6 @@ import java.io.BufferedWriter;
 import java.io.File;
 import java.math.BigDecimal;
 import java.util.List;
-
 import pcgen.cdom.enumeration.CharID;
 import pcgen.cdom.enumeration.Gender;
 import pcgen.cdom.enumeration.Handed;
@@ -48,6 +47,7 @@ import pcgen.facade.util.DefaultListFacade;
 import pcgen.facade.util.ListFacade;
 import pcgen.facade.util.ReferenceFacade;
 import pcgen.facade.util.event.ChangeListener;
+import pcgen.facade.util.event.ReferenceListener;
 import pcgen.io.ExportException;
 import pcgen.io.ExportHandler;
 
@@ -852,4 +852,8 @@ public interface CharacterFacade extends CompanionFacade
 	public String getPreviewSheetVar(String key);
 
 	public void addPreviewSheetVar(String key, String value);
+
+	public void addStatsBonusesChangedListener(ReferenceListener<Integer> listener);
+
+	public void removeStatsBonusesChangedListener(ReferenceListener<Integer> listener);
 }

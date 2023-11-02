@@ -21,12 +21,6 @@ package pcgen.gui3.dialog;
 import java.io.IOException;
 import java.net.URL;
 import java.util.ResourceBundle;
-
-import pcgen.system.LanguageBundle;
-
-import javafx.fxml.FXMLLoader;
-import javafx.scene.Scene;
-import javafx.stage.Stage;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.testfx.api.FxAssert;
@@ -34,6 +28,12 @@ import org.testfx.api.FxRobotInterface;
 import org.testfx.framework.junit5.ApplicationExtension;
 import org.testfx.framework.junit5.Start;
 import org.testfx.matcher.base.NodeMatchers;
+import pcgen.gui3.dialog.about.AboutDialogController;
+import pcgen.system.LanguageBundle;
+
+import javafx.fxml.FXMLLoader;
+import javafx.scene.Scene;
+import javafx.stage.Stage;
 
 @ExtendWith(ApplicationExtension.class)
 class AboutDialogTest

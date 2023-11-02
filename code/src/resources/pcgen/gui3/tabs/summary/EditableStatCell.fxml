@@ -1,0 +1,10 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+
+<?import javafx.scene.control.Spinner?>
+<?import javafx.scene.layout.HBox?>
+<HBox xmlns="http://javafx.com/javafx/21"
+      xmlns:fx="http://javafx.com/fxml/1"
+      fx:controller="pcgen.gui3.tabs.summary.EditableStatCell">
+    <Spinner fx:id="spinner" min="0" max="1000" amountToStepBy="1" editable="true" onKeyReleased="#onKeyReleased"/>
+</HBox>

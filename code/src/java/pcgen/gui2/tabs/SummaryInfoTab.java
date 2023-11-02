@@ -30,11 +30,12 @@ import java.awt.GridBagLayout;
 import java.awt.GridLayout;
 import java.awt.Insets;
 import java.awt.event.ActionEvent;
+import java.io.IOException;
+import java.net.URL;
 import java.text.NumberFormat;
 import java.util.Arrays;
 import java.util.Collection;
 import java.util.TreeSet;
-
 import javax.swing.AbstractAction;
 import javax.swing.BorderFactory;
 import javax.swing.Box;
@@ -61,7 +62,7 @@ import javax.swing.border.Border;
 import javax.swing.border.TitledBorder;
 import javax.swing.event.HyperlinkEvent;
 import javax.swing.event.HyperlinkListener;
-
+import org.apache.commons.lang3.StringUtils;
 import pcgen.cdom.enumeration.Gender;
 import pcgen.cdom.enumeration.Handed;
 import pcgen.cdom.util.CControl;
@@ -103,11 +104,16 @@ import pcgen.gui2.util.SignIcon.Sign;
 import pcgen.gui2.util.SimpleTextIcon;
 import pcgen.gui3.JFXPanelFromResource;
 import pcgen.gui3.SimpleHtmlPanelController;
+import pcgen.gui3.tabs.summary.AbilityScores;
+import pcgen.gui3.tabs.summary.AbilityScoresModel;
 import pcgen.gui3.utilty.ColorUtilty;
 import pcgen.system.LanguageBundle;
 import pcgen.util.enumeration.Tab;
 
-import org.apache.commons.lang3.StringUtils;
+import javafx.application.Platform;
+import javafx.embed.swing.JFXPanel;
+import javafx.fxml.FXMLLoader;
+import javafx.scene.Scene;
 
 /**
  * This component displays a basic summary of a character such as name,
@@ -120,7 +126,8 @@ public class SummaryInfoTab extends JPanel implements CharacterInfoTab, TodoHand
 	private final TabTitle tabTitle;
 	private final JPanel basicsPanel;
 	private final JPanel todoPanel;
-	private final JPanel scoresPanel;
+	private final JFXPanel scoresPanel;
+	private AbilityScores abilityScores;
 	private final JPanel racePanel;
 	private final JPanel classPanel;
 	private final JTextField characterNameField;
@@ -169,7 +176,7 @@ public class SummaryInfoTab extends JPanel implements CharacterInfoTab, TodoHand
 		this.tabTitle = new TabTitle(Tab.SUMMARY);
 		this.basicsPanel = new JPanel();
 		this.todoPanel = new JPanel();
-		this.scoresPanel = new JPanel();
+		this.scoresPanel = new JFXPanel();
 		this.racePanel = new JPanel();
 		this.classPanel = new JPanel();
 		this.characterNameField = new JTextField();
@@ -245,7 +252,8 @@ public class SummaryInfoTab extends JPanel implements CharacterInfoTab, TodoHand
 		gbc.gridheight = GridBagConstraints.REMAINDER;
 		add(todoPanel, gbc);
 
-		initMiddlePanel(scoresPanel);
+		Platform.runLater(() -> initMiddlePanel(scoresPanel));
+
 		gbc.gridy = GridBagConstraints.RELATIVE;
 		gbc.weightx = 1;
 		add(scoresPanel, gbc);
@@ -257,6 +265,8 @@ public class SummaryInfoTab extends JPanel implements CharacterInfoTab, TodoHand
 		gbc.weightx = 0.1;
 		gbc.weighty = 1;
 		add(rightPanel, gbc);
+
+
 	}
 
 	private static void setPanelTitle(JComponent panel, String title)
@@ -284,15 +294,34 @@ public class SummaryInfoTab extends JPanel implements CharacterInfoTab, TodoHand
 		panel.add(scroll, BorderLayout.CENTER);
 	}
 
-	private void initMiddlePanel(JPanel middlePanel)
+	private void initMiddlePanel(JFXPanel middlePanel)
 	{
+		URL resource = AbilityScores.class.getResource(AbilityScores.class.getSimpleName() + ".fxml");
+		FXMLLoader loader = new FXMLLoader(resource, LanguageBundle.getBundle());
+
+		Scene scene = null;
+		try
+		{
+			scene = loader.load();
+			abilityScores = loader.getController();
+		}
+		catch (IOException e)
+		{
+			throw new RuntimeException(e);
+		}
+
+		middlePanel.setScene(scene);
+
+		StatTableModel.initializeTable(statsTable);
+
+
 		middlePanel.setLayout(new GridLayout(2, 1));
 
 		JPanel statsPanel = new JPanel();
 		setPanelTitle(statsPanel, LanguageBundle.getString("in_sumAbilityScores")); //$NON-NLS-1$
 		statsPanel.setLayout(new BoxLayout(statsPanel, BoxLayout.Y_AXIS));
 
-		StatTableModel.initializeTable(statsTable);
+
 		JScrollPane pane = new JScrollPane(statsTable, ScrollPaneConstants.VERTICAL_SCROLLBAR_AS_NEEDED,
 			ScrollPaneConstants.HORIZONTAL_SCROLLBAR_NEVER)
 		{
@@ -333,11 +362,12 @@ public class SummaryInfoTab extends JPanel implements CharacterInfoTab, TodoHand
 		statTotalPanel.add(Box.createHorizontalGlue());
 		statsPanel.add(statTotalPanel);
 
-		middlePanel.add(statsPanel);
+		//middlePanel.add(statsPanel);
 
 		pane = new JScrollPane(infoPane);
 		setPanelTitle(pane, LanguageBundle.getString("in_sumStats")); //$NON-NLS-1$
-		middlePanel.add(pane);
+		//middlePanel.add(pane);
+
 	}
 
 	private void initRightPanel(JPanel rightPanel)
@@ -665,6 +695,8 @@ public class SummaryInfoTab extends JPanel implements CharacterInfoTab, TodoHand
 		models.put(ExpSubtractAction.class, new ExpSubtractAction(character));
 		models.put(TodoListHandler.class, new TodoListHandler(character));
 		models.put(HPHandler.class, new HPHandler(character));
+		//TODO: new
+		models.put(AbilityScoresModel.class, new AbilityScoresModel(character));
 		return models;
 	}
 
@@ -689,6 +721,9 @@ public class SummaryInfoTab extends JPanel implements CharacterInfoTab, TodoHand
 		models.get(HPHandler.class).uninstall();
 
 		models.get(ComboBoxRendererHandler.class).uninstall();
+
+		//TODO: new
+		models.get(AbilityScoresModel.class).uninstall();
 	}
 
 	@Override
@@ -721,6 +756,11 @@ public class SummaryInfoTab extends JPanel implements CharacterInfoTab, TodoHand
 		expmodField.setAction(expAddAction);
 		expsubtractButton.setAction(models.get(ExpSubtractAction.class));
 		addLevelsAction.install();
+
+		//TODO: new
+		AbilityScoresModel abilityScoresModel = models.get(AbilityScoresModel.class);
+		abilityScoresModel.install();
+		abilityScores.getAbilityScoresModelProperty().set(abilityScoresModel);
 
 		resetBasicsPanel();
 	}

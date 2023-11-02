@@ -15,14 +15,14 @@
  * Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA 02111-1307 USA
  */
 
-package pcgen.gui3.dialog;
+package pcgen.gui3.dialog.about;
 
 import java.io.IOException;
 import java.net.URI;
 import java.net.URL;
 import java.nio.file.Files;
 import java.nio.file.Paths;
-
+import org.apache.commons.lang3.StringUtils;
 import pcgen.gui2.tools.DesktopBrowserLauncher;
 import pcgen.system.LanguageBundle;
 import pcgen.system.PCGenPropBundle;
@@ -34,7 +34,6 @@ import javafx.scene.control.Button;
 import javafx.scene.control.Labeled;
 import javafx.scene.control.TextArea;
 import javafx.scene.text.Text;
-import org.apache.commons.lang3.StringUtils;
 
 /**
  * Controller for about panel.

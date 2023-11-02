@@ -22,7 +22,6 @@ import java.text.MessageFormat;
 import java.util.Locale;
 import java.util.MissingResourceException;
 import java.util.ResourceBundle;
-
 import pcgen.util.Logging;
 
 /**
@@ -182,6 +181,10 @@ public final class LanguageBundle
 
 	public static ResourceBundle getBundle()
 	{
+		if (bundle == null)
+		{
+			init();
+		}
 		return bundle;
 	}
 }
