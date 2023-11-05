@@ -7,10 +7,10 @@ import javafx.beans.binding.Bindings;
 import javafx.beans.property.ObjectProperty;
 import javafx.beans.property.SimpleObjectProperty;
 import javafx.beans.value.ObservableIntegerValue;
+import javafx.beans.value.ObservableStringValue;
 import javafx.beans.value.ObservableValue;
 import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
-import javafx.fxml.FXML;
 import javafx.scene.control.TableCell;
 import javafx.scene.control.TableColumn;
 import javafx.scene.control.cell.TextFieldTableCell;
@@ -23,17 +23,7 @@ public class AbilityScores
     private final ObjectProperty<AbilityScoresModel> abilityScoresModelProperty = new SimpleObjectProperty<>();
 
     private final ObservableList<AbilityScoresModel.StatValues> pcStatList =
-            FXCollections.observableArrayList();/*statValues-> new Observable[]{
-                    statValues.getLabel(),
-                    statValues.getTotal(),
-                    statValues.getMod(),
-                    statValues.getBase(),
-                    statValues.getRaceBonus(),
-                    statValues.getOtherBonus()
-            });*/
-
-    @FXML
-    public TableColumn<AbilityScoresModel.StatValues, Integer> editableColumn;
+            FXCollections.observableArrayList();
 
     public AbilityScores()
     {
@@ -62,7 +52,7 @@ public class AbilityScores
         return cellDataFeatures -> cellDataFeatures.getValue().getTotal();
     }
 
-    public Callback<TableColumn.CellDataFeatures<AbilityScoresModel.StatValues, Integer>, ObservableIntegerValue> getModFactory()
+    public Callback<TableColumn.CellDataFeatures<AbilityScoresModel.StatValues, String>, ObservableStringValue> getModFactory()
     {
         return cellDataFeatures -> cellDataFeatures.getValue().getMod();
     }
@@ -82,12 +72,12 @@ public class AbilityScores
         return CustomTableCellFactory.forTableColumn(EditableStatCell.class);
     }
 
-    public Callback<TableColumn.CellDataFeatures<AbilityScoresModel.StatValues, Integer>, ObservableIntegerValue> getRaceBonusFactory()
+    public Callback<TableColumn.CellDataFeatures<AbilityScoresModel.StatValues, String>, ObservableStringValue> getRaceBonusFactory()
     {
         return cellDataFeatures -> cellDataFeatures.getValue().getRaceBonus();
     }
 
-    public Callback<TableColumn.CellDataFeatures<AbilityScoresModel.StatValues, Integer>, ObservableIntegerValue> getOtherBonusFactory()
+    public Callback<TableColumn.CellDataFeatures<AbilityScoresModel.StatValues, String>, ObservableStringValue> getOtherBonusFactory()
     {
         return cellDataFeatures -> cellDataFeatures.getValue().getOtherBonus();
     }

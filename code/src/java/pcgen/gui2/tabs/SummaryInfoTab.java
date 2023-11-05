@@ -27,11 +27,8 @@ import java.awt.FlowLayout;
 import java.awt.Font;
 import java.awt.GridBagConstraints;
 import java.awt.GridBagLayout;
-import java.awt.GridLayout;
 import java.awt.Insets;
 import java.awt.event.ActionEvent;
-import java.io.IOException;
-import java.net.URL;
 import java.text.NumberFormat;
 import java.util.Arrays;
 import java.util.Collection;
@@ -107,12 +104,12 @@ import pcgen.gui3.SimpleHtmlPanelController;
 import pcgen.gui3.tabs.summary.AbilityScores;
 import pcgen.gui3.tabs.summary.AbilityScoresModel;
 import pcgen.gui3.utilty.ColorUtilty;
+import pcgen.gui3.utilty.JavaFXLoader;
 import pcgen.system.LanguageBundle;
 import pcgen.util.enumeration.Tab;
 
 import javafx.application.Platform;
 import javafx.embed.swing.JFXPanel;
-import javafx.fxml.FXMLLoader;
 import javafx.scene.Scene;
 
 /**
@@ -296,26 +293,15 @@ public class SummaryInfoTab extends JPanel implements CharacterInfoTab, TodoHand
 
 	private void initMiddlePanel(JFXPanel middlePanel)
 	{
-		URL resource = AbilityScores.class.getResource(AbilityScores.class.getSimpleName() + ".fxml");
-		FXMLLoader loader = new FXMLLoader(resource, LanguageBundle.getBundle());
+		JavaFXLoader.Components<Scene, AbilityScores> components = JavaFXLoader.load(AbilityScores.class);
 
-		Scene scene = null;
-		try
-		{
-			scene = loader.load();
-			abilityScores = loader.getController();
-		}
-		catch (IOException e)
-		{
-			throw new RuntimeException(e);
-		}
-
-		middlePanel.setScene(scene);
+		abilityScores = components.controller();
+		middlePanel.setScene(components.fxml());
 
 		StatTableModel.initializeTable(statsTable);
 
 
-		middlePanel.setLayout(new GridLayout(2, 1));
+		//middlePanel.setLayout(new GridLayout(2, 1));
 
 		JPanel statsPanel = new JPanel();
 		setPanelTitle(statsPanel, LanguageBundle.getString("in_sumAbilityScores")); //$NON-NLS-1$

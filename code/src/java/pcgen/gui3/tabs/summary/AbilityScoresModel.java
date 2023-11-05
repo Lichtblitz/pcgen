@@ -13,6 +13,7 @@ import pcgen.core.PCStat;
 import pcgen.facade.core.CharacterFacade;
 import pcgen.facade.util.event.ReferenceEvent;
 import pcgen.facade.util.event.ReferenceListener;
+import pcgen.gui2.util.PrettyIntegerFormat;
 
 import javafx.application.Platform;
 import javafx.beans.property.IntegerProperty;
@@ -36,11 +37,11 @@ public class AbilityScoresModel implements ReferenceListener
     {
         @Builder
         private StatValues(@NonNull String label,
-                           int mod,
+                           @NonNull String mod,
                            int base,
-                           int raceBonus,
+                           @NonNull String raceBonus,
                            @NonNull String total,
-                           int otherBonus,
+                           @NonNull String otherBonus,
                            @NonNull ChangeListener<Number> changeListener)
         {
             this.label.set(label);
@@ -54,11 +55,11 @@ public class AbilityScoresModel implements ReferenceListener
         }
 
         StringProperty label = new SimpleStringProperty();
-        IntegerProperty mod = new SimpleIntegerProperty();
+        StringProperty mod = new SimpleStringProperty();
         IntegerProperty base = new SimpleIntegerProperty();
-        IntegerProperty raceBonus = new SimpleIntegerProperty();
+        StringProperty raceBonus = new SimpleStringProperty();
         StringProperty total = new SimpleStringProperty();
-        IntegerProperty otherBonus = new SimpleIntegerProperty();
+        StringProperty otherBonus = new SimpleStringProperty();
 
         @EqualsAndHashCode.Include
         private String getLabelValue()
@@ -67,7 +68,7 @@ public class AbilityScoresModel implements ReferenceListener
         }
 
         @EqualsAndHashCode.Include
-        private int getModValue()
+        private String getModValue()
         {
             return mod.getValue();
         }
@@ -79,7 +80,7 @@ public class AbilityScoresModel implements ReferenceListener
         }
 
         @EqualsAndHashCode.Include
-        private int getRaceBonusValue()
+        private String getRaceBonusValue()
         {
             return raceBonus.getValue();
         }
@@ -91,7 +92,7 @@ public class AbilityScoresModel implements ReferenceListener
         }
 
         @EqualsAndHashCode.Include
-        private int getOtherBonusValue()
+        private String getOtherBonusValue()
         {
             return otherBonus.getValue();
         }
@@ -162,11 +163,11 @@ public class AbilityScoresModel implements ReferenceListener
     {
         return StatValues.builder()
                 .label(stat.getDisplayName())
-                .mod(character.getModTotal(stat))
+                .mod(formatModValue(character.getModTotal(stat)))
                 .base(character.getScoreBase(stat))
-                .raceBonus(character.getScoreRaceBonus(stat))
+                .raceBonus(formatModValue(character.getScoreRaceBonus(stat)))
                 .total(character.getScoreTotalString(stat))
-                .otherBonus(character.getScoreOtherBonus(stat))
+                .otherBonus(formatModValue(character.getScoreOtherBonus(stat)))
                 .changeListener((observable, oldValue, newValue) ->
                         character.setScoreBase(stat, newValue.intValue()))
                 .build();
@@ -176,10 +177,21 @@ public class AbilityScoresModel implements ReferenceListener
     private static void overrideObjectProperty(PCStat stat, CharacterFacade character, StatValues values)
     {
         values.getLabel().setValue(stat.getDisplayName());
-        values.getMod().setValue(character.getModTotal(stat));
+        values.getMod().setValue(formatModValue(character.getModTotal(stat)));
         values.getBase().setValue(character.getScoreBase(stat));
-        values.getRaceBonus().setValue(character.getScoreRaceBonus(stat));
+        values.getRaceBonus().setValue(formatModValue(character.getScoreRaceBonus(stat)));
         values.getTotal().setValue(character.getScoreTotalString(stat));
-        values.getOtherBonus().setValue(character.getScoreOtherBonus(stat));
+        values.getOtherBonus().setValue(formatModValue(character.getScoreOtherBonus(stat)));
+    }
+
+
+    private static String formatModValue(int value)
+    {
+        if (value == 0)
+        {
+            // let's use a pretty em dash instead of hyphen/minus.
+            return "\u2014";
+        }
+        return PrettyIntegerFormat.getFormat().format(value);
     }
 }
